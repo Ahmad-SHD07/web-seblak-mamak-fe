@@ -276,7 +276,7 @@ export default function Home() {
     const fetchMenus = async () => {
       try {
         setIsLoadingMenus(true);
-        const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://seblak-makeunin.onrender.com/api';
         const res = await axios.get(`${apiUrl}/menus`, { timeout: 3000 });
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setMenus(res.data.data);

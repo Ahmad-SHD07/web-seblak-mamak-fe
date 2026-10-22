@@ -69,15 +69,27 @@ export default function CartDrawer({
       }))
     };
 
+    const openWhatsAppUrl = (url) => {
+      // Coba buka tab baru; jika diblokir popup blocker (seperti di browser Brave/Chrome), langsung alihkan halaman
+      try {
+        const win = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          window.location.href = url;
+        }
+      } catch {
+        window.location.href = url;
+      }
+    };
+
     try {
-      // Panggil backend API sesuai PRD spesifikasi
-      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      // Panggil backend API yang sudah live di Render
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://seblak-makeunin.onrender.com/api';
       const response = await axios.post(`${apiUrl}/checkout`, payload, {
-        timeout: 5000
+        timeout: 4000
       });
 
       if (response.data && response.data.waUrl) {
-        window.open(response.data.waUrl, '_blank', 'noopener,noreferrer');
+        openWhatsAppUrl(response.data.waUrl);
         setIsLoading(false);
         return;
       }
@@ -121,7 +133,7 @@ export default function CartDrawer({
 
       const waPhone = import.meta.env.VITE_WA_NUMBER || '6283824468119';
       const fallbackUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
-      window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+      openWhatsAppUrl(fallbackUrl);
       setIsLoading(false);
     }
   };
