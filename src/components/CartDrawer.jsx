@@ -20,7 +20,9 @@ export default function CartDrawer({
   if (!isOpen) return null;
 
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.qty, 0);
-  const totalPrice = cartItems.reduce((acc, item) => acc + item.harga * item.qty, 0);
+  const subtotalItems = cartItems.reduce((acc, item) => acc + item.harga * item.qty, 0);
+  const extraSpicyFee = (Number(spicyLevel) === 4 || Number(spicyLevel) === 5) ? 2000 : 0;
+  const totalPrice = subtotalItems + extraSpicyFee;
 
   const orderTypeOptions = [
     { label: 'Bungkus (Takeaway)', icon: 'takeout_dining' },
@@ -29,12 +31,12 @@ export default function CartDrawer({
   ];
 
   const spicyLevels = [
-    { level: 0, label: 'Lv 0 (Tidak Pedas)' },
-    { level: 1, label: 'Lv 1 (Pedas Santai)' },
-    { level: 2, label: 'Lv 2 (Pedas Sedang)' },
-    { level: 3, label: 'Lv 3 (Pedas Mantap)' },
-    { level: 4, label: 'Lv 4 (Pedas Nampol)' },
-    { level: 5, label: 'Lv 5 (Sangat Pedas)' },
+    { level: 0, label: 'Lv 0 (Tidak Pedas - Bumbu gurih kencur & kaldu)', shortLabel: 'Tidak Pedas' },
+    { level: 1, label: 'Lv 1 (Pedas Santai - Cabai rawit ringan)', shortLabel: 'Pedas Santai' },
+    { level: 2, label: 'Lv 2 (Pedas Sedang - Standar khas Mak Eunin)', shortLabel: 'Pedas Sedang' },
+    { level: 3, label: 'Lv 3 (Pedas Mantap - Penikmat pedas sejati)', shortLabel: 'Pedas Mantap' },
+    { level: 4, label: 'Lv 4 (Pedas Nampol +Rp 2.000)', shortLabel: 'Pedas Nampol' },
+    { level: 5, label: 'Lv 5 (Sangat Pedas / Level Dewa +Rp 2.000)', shortLabel: 'Sangat Pedas / Level Dewa' },
   ];
 
   const handleCheckout = async (e) => {
@@ -61,6 +63,7 @@ export default function CartDrawer({
       items: cartItems.map((item) => ({
         menuId: item.id,
         nama: item.nama,
+        kategori: item.kategori,
         harga: item.harga,
         qty: item.qty
       }))
@@ -68,7 +71,7 @@ export default function CartDrawer({
 
     try {
       // Panggil backend API sesuai PRD spesifikasi
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       const response = await axios.post(`${apiUrl}/checkout`, payload, {
         timeout: 5000
       });
@@ -82,30 +85,41 @@ export default function CartDrawer({
     } catch (err) {
       console.warn('Backend offline / gagal terhubung. Menggunakan fallback WhatsApp client generator.', err);
 
-      // Fallback generator client-side agar pengguna tetap bisa memesan jika BE belum berjalan
-      const spicyText = spicyLevels.find((s) => s.level === Number(spicyLevel))?.label || `Level ${spicyLevel}`;
+      // Fallback generator client-side sesuai template PRD-2 Bagian 1.2
+      const selectedSpicy = spicyLevels.find((s) => s.level === Number(spicyLevel));
+      const spicyLabel = selectedSpicy ? selectedSpicy.shortLabel : `Level ${spicyLevel}`;
+      
+      const toppingItems = cartItems
+        .filter((i) => i.kategori === 'Pilih Topping' || String(i.id).startsWith('T'))
+        .map((i) => `${i.qty}x ${i.nama}`);
+      const toppingText = toppingItems.length > 0 ? toppingItems.join(', ') : '-';
+
       const menuLines = cartItems.map(
-        (i) => `- ${i.qty}x ${i.nama} (${formatRupiah(i.harga * i.qty)})`
+        (i) => `${i.nama} (x${i.qty}) - ${formatRupiah(i.harga * i.qty)}`
       );
+      if (extraSpicyFee > 0) {
+        menuLines.push(`Biaya Ekstra Pedas (Lv ${spicyLevel}) - ${formatRupiah(extraSpicyFee)}`);
+      }
 
       const waText = [
-        '🔥 *PESANAN BARU - SEBLAK MAK EUNIN* 🔥',
+        '*PESANAN BARU - SEBLAK MAK EUNIN*',
         '----------------------------------------',
         `*Nama Pemesan:* ${customerName.trim()}`,
-        `*Opsi Pesanan:* ${orderType}`,
-        `*Tingkat Kepedasan:* ${spicyText}`,
-        `*Catatan:* ${notes.trim() || '-'}`,
+        `*Tipe Pesanan:* ${orderType}`,
+        `*Level Pedas:* Lv ${spicyLevel} (${spicyLabel})`,
+        `*Tambahan Topping:* ${toppingText}`,
+        `*Catatan Khusus:* ${notes.trim() || '-'}`,
         '',
-        '📋 *Daftar Menu:*',
+        '*Rincian Menu:*',
         ...menuLines,
         '',
         '----------------------------------------',
-        `💰 *Total Pembayaran:* ${formatRupiah(totalPrice)}`,
+        `*Total Pembayaran:* ${formatRupiah(totalPrice)}`,
         '----------------------------------------',
-        'Mohon segera dikonfirmasi ya, terima kasih! 🙏'
+        'Mohon ditunggu, pesanan sedang diproses ya! 🙏'
       ].join('\n');
 
-      const waPhone = '6281234567890';
+      const waPhone = import.meta.env.VITE_WA_NUMBER || '6283824468119';
       const fallbackUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
       window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
       setIsLoading(false);
@@ -333,9 +347,16 @@ export default function CartDrawer({
           {cartItems.length > 0 && (
             <div className="p-4 sm:p-5 border-t border-surface-container-high bg-surface-container/30 space-y-3">
               <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>Subtotal ({totalQuantity} item)</span>
-                <span className="font-semibold text-dark">{formatRupiah(totalPrice)}</span>
+                <span>Subtotal Menu ({totalQuantity} item)</span>
+                <span className="font-semibold text-dark">{formatRupiah(subtotalItems)}</span>
               </div>
+
+              {extraSpicyFee > 0 && (
+                <div className="flex justify-between items-center text-xs text-primary font-semibold">
+                  <span>Biaya Ekstra Pedas (Lv {spicyLevel})</span>
+                  <span>+{formatRupiah(extraSpicyFee)}</span>
+                </div>
+              )}
 
               <div className="flex justify-between items-center pt-2 border-t border-surface-container-high">
                 <span className="text-sm font-bold text-dark">Total Pembayaran</span>

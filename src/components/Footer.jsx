@@ -87,7 +87,7 @@ export default function Footer() {
                 Kebijakan Privasi
               </a>
               <a
-                href="https://wa.me/6281234567890"
+                href="https://wa.me/6283824468119"
                 target="_blank"
                 rel="noreferrer"
                 className="text-sm text-gray-600 hover:text-primary transition-colors w-max flex items-center gap-1"

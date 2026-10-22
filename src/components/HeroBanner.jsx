@@ -2,10 +2,10 @@ import { formatRupiah } from '../utils/formatCurrency';
 
 export default function HeroBanner({ bestsellerItem, onOrderNow }) {
   const defaultBestseller = {
-    id: 4,
-    nama: 'Seblak Kerupuk Istimewa',
-    harga: 15000,
-    deskripsi: 'Hidangan khas kami yang menyajikan perpaduan sempurna antara kerupuk basah kenyal, kuah pedas kencur gurih berempah, dengan kuah merah merona khas Mak Eunin.',
+    id: 'M01',
+    nama: 'Seblak Best Seller (Paket)',
+    harga: 10000,
+    deskripsi: 'Seblak Makaroni, Kerupuk Kemplang, Cikua, Mie Kuning, dan Pilus khas Mak Eunin.',
     gambar: '/image/Seblak/seblak2.webp'
   };
 
