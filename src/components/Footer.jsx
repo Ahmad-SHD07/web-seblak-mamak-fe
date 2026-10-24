@@ -19,7 +19,7 @@ export default function Footer() {
             <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 mt-2">
               <span className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
-                Buka: 10.00 - 21.00 WIB
+                Buka: 08.00 - 17.00 WIB
               </span>
               <span className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-[16px] text-primary">location_on</span>

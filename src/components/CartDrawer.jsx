@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { formatRupiah } from '../utils/formatCurrency';
 
 export default function CartDrawer({
@@ -14,7 +13,6 @@ export default function CartDrawer({
   const [orderType, setOrderType] = useState('Bungkus (Takeaway)');
   const [spicyLevel, setSpicyLevel] = useState(2);
   const [notes, setNotes] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
@@ -39,10 +37,14 @@ export default function CartDrawer({
     { level: 5, label: 'Lv 5 (Sangat Pedas / Level Dewa +Rp 2.000)', shortLabel: 'Sangat Pedas / Level Dewa' },
   ];
 
-  const handleCheckout = async (e) => {
-    e.preventDefault();
+  // Fungsi pengiriman pesanan langsung ke WhatsApp (Pure Frontend)
+  const handleCheckout = (e) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     setErrorMessage('');
 
+    // Validasi input pemesan
     if (!customerName.trim()) {
       setErrorMessage('Silakan isi Nama Pemesan terlebih dahulu.');
       return;
@@ -53,90 +55,58 @@ export default function CartDrawer({
       return;
     }
 
-    setIsLoading(true);
+    // Detail level pedas terpilih
+    const selectedSpicy = spicyLevels.find((s) => s.level === Number(spicyLevel));
+    const spicyLabel = selectedSpicy ? selectedSpicy.shortLabel : `Level ${spicyLevel}`;
 
-    const payload = {
-      customerName: customerName.trim(),
-      orderType,
-      spicyLevel: Number(spicyLevel),
-      notes: notes.trim(),
-      items: cartItems.map((item) => ({
-        menuId: item.id,
-        nama: item.nama,
-        kategori: item.kategori,
-        harga: item.harga,
-        qty: item.qty
-      }))
-    };
+    // Filter daftar topping jika ada
+    const toppingItems = cartItems
+      .filter((i) => i.kategori === 'Pilih Topping' || String(i.id).startsWith('T'))
+      .map((i) => `${i.qty}x ${i.nama}`);
+    const toppingText = toppingItems.length > 0 ? toppingItems.join(', ') : '-';
 
-    const openWhatsAppUrl = (url) => {
-      // Coba buka tab baru; jika diblokir popup blocker (seperti di browser Brave/Chrome), langsung alihkan halaman
-      try {
-        const win = window.open(url, '_blank', 'noopener,noreferrer');
-        if (!win || win.closed || typeof win.closed === 'undefined') {
-          window.location.href = url;
-        }
-      } catch {
-        window.location.href = url;
-      }
-    };
+    // Rincian menu pesanan
+    const menuLines = cartItems.map(
+      (i) => `- ${i.nama} (x${i.qty}) : ${formatRupiah(i.harga * i.qty)}`
+    );
+    if (extraSpicyFee > 0) {
+      menuLines.push(`- Biaya Ekstra Pedas (Lv ${spicyLevel}) : ${formatRupiah(extraSpicyFee)}`);
+    }
 
+    // Susun format pesan WhatsApp rapi
+    const waText = [
+      '*PESANAN BARU - SEBLAK MAK EUNIN*',
+      '----------------------------------------',
+      `*Nama Pemesan:* ${customerName.trim()}`,
+      `*Tipe Pesanan:* ${orderType}`,
+      `*Level Pedas:* Lv ${spicyLevel} (${spicyLabel})`,
+      `*Tambahan Topping:* ${toppingText}`,
+      `*Catatan Khusus:* ${notes.trim() || '-'}`,
+      '',
+      '*Rincian Menu:*',
+      ...menuLines,
+      '',
+      '----------------------------------------',
+      `*Total Pembayaran:* ${formatRupiah(totalPrice)}`,
+      '----------------------------------------',
+      'Mohon ditunggu, pesanan sedang diproses ya! 🙏'
+    ].join('\n');
+
+    // Nomor WhatsApp tujuan
+    const waPhone = import.meta.env.VITE_WA_NUMBER || '6283824468119';
+    const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
+
+    // Buka WhatsApp
     try {
-      // Panggil backend API yang sudah live di Render
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://seblak-makeunin.onrender.com/api';
-      const response = await axios.post(`${apiUrl}/checkout`, payload, {
-        timeout: 4000
-      });
-
-      if (response.data && response.data.waUrl) {
-        openWhatsAppUrl(response.data.waUrl);
-        setIsLoading(false);
-        return;
+      const win = window.open(waUrl, '_blank', 'noopener,noreferrer');
+      if (!win || win.closed || typeof win.closed === 'undefined') {
+        window.location.href = waUrl;
       }
-      throw new Error('URL WhatsApp tidak ditemukan');
-    } catch (err) {
-      console.warn('Backend offline / gagal terhubung. Menggunakan fallback WhatsApp client generator.', err);
-
-      // Fallback generator client-side sesuai template PRD-2 Bagian 1.2
-      const selectedSpicy = spicyLevels.find((s) => s.level === Number(spicyLevel));
-      const spicyLabel = selectedSpicy ? selectedSpicy.shortLabel : `Level ${spicyLevel}`;
-      
-      const toppingItems = cartItems
-        .filter((i) => i.kategori === 'Pilih Topping' || String(i.id).startsWith('T'))
-        .map((i) => `${i.qty}x ${i.nama}`);
-      const toppingText = toppingItems.length > 0 ? toppingItems.join(', ') : '-';
-
-      const menuLines = cartItems.map(
-        (i) => `${i.nama} (x${i.qty}) - ${formatRupiah(i.harga * i.qty)}`
-      );
-      if (extraSpicyFee > 0) {
-        menuLines.push(`Biaya Ekstra Pedas (Lv ${spicyLevel}) - ${formatRupiah(extraSpicyFee)}`);
-      }
-
-      const waText = [
-        '*PESANAN BARU - SEBLAK MAK EUNIN*',
-        '----------------------------------------',
-        `*Nama Pemesan:* ${customerName.trim()}`,
-        `*Tipe Pesanan:* ${orderType}`,
-        `*Level Pedas:* Lv ${spicyLevel} (${spicyLabel})`,
-        `*Tambahan Topping:* ${toppingText}`,
-        `*Catatan Khusus:* ${notes.trim() || '-'}`,
-        '',
-        '*Rincian Menu:*',
-        ...menuLines,
-        '',
-        '----------------------------------------',
-        `*Total Pembayaran:* ${formatRupiah(totalPrice)}`,
-        '----------------------------------------',
-        'Mohon ditunggu, pesanan sedang diproses ya! 🙏'
-      ].join('\n');
-
-      const waPhone = import.meta.env.VITE_WA_NUMBER || '6283824468119';
-      const fallbackUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
-      openWhatsAppUrl(fallbackUrl);
-      setIsLoading(false);
+    } catch {
+      window.location.href = waUrl;
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden animate-fadeIn">
@@ -379,22 +349,10 @@ export default function CartDrawer({
 
               <button
                 onClick={handleCheckout}
-                disabled={isLoading}
-                className="w-full py-3.5 px-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-98 transition disabled:opacity-50"
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-98 transition"
               >
-                {isLoading ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin text-[20px]">
-                      progress_activity
-                    </span>
-                    <span>Menyiapkan Pesanan...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[20px]">chat</span>
-                    <span>Pesan via WhatsApp Sekarang</span>
-                  </>
-                )}
+                <span className="material-symbols-outlined text-[20px]">chat</span>
+                <span>Pesan via WhatsApp Sekarang</span>
               </button>
 
               <p className="text-[11px] text-center text-gray-400">
