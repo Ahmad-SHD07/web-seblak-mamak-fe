@@ -5,12 +5,11 @@ export default function CategoryFilter({
 }) {
   const categories = [
     { label: 'Semua Menu', value: 'Semua Menu', icon: 'restaurant_menu' },
-    { label: 'Seblak', value: 'Seblak', icon: 'ramen_dining' },
-    { label: 'Pilih Topping', value: 'Pilih Topping', icon: 'egg' },
-    { label: 'Gorengan', value: 'Gorengan', icon: 'lunch_dining' },
-    { label: 'Cobek', value: 'Cobek', icon: 'flatware' },
+    { label: 'Toping Seblak', value: 'Pilih Topping', icon: 'ramen_dining' },
     { label: 'Pisang Keju', value: 'Pisang Keju', icon: 'cake' },
     { label: 'Minuman', value: 'Minuman', icon: 'local_drink' },
+    { label: 'Gorengan', value: 'Gorengan', icon: 'lunch_dining' },
+    { label: 'Cobek', value: 'Cobek', icon: 'flatware' },
   ];
 
   return (
