@@ -19,17 +19,11 @@ export default function CartDrawer({
   totalCartCount = 0
 }) {
   const [customerName, setCustomerName] = useState('');
-  const [orderType, setOrderType] = useState('Bungkus (Takeaway)');
+  const orderType = 'Bungkus (Takeaway)';
   const [notes, setNotes] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
-
-  const orderTypeOptions = [
-    { label: 'Bungkus (Takeaway)', icon: 'takeout_dining' },
-    { label: 'Makan di Tempat', icon: 'table_restaurant' },
-    { label: 'Diantar (Delivery)', icon: 'delivery_dining' },
-  ];
 
   const spicyLevels = [
     { level: 0, label: 'Lv 0 (Tidak Pedas)', shortLabel: 'Tidak Pedas' },
@@ -44,6 +38,8 @@ export default function CartDrawer({
   const bowlsWithItems = seblakBowls.filter((b) => b.items && b.items.length > 0);
   const hasSeblak = bowlsWithItems.length > 0;
   const hasAnyItems = hasSeblak || extraItems.length > 0;
+  // Catatan khusus hanya WAJIB jika memesan minuman atau pisang keju (karena ada varian/toping)
+  const isNotesRequired = extraItems.length > 0;
 
   // Checkout Pesanan ke WhatsApp
   const handleCheckout = (e) => {
@@ -62,8 +58,8 @@ export default function CartDrawer({
       return;
     }
 
-    if (!notes.trim()) {
-      setErrorMessage('Silakan isi Catatan Khusus terlebih dahulu (bumbu manis/gurih & toping).');
+    if (isNotesRequired && !notes.trim()) {
+      setErrorMessage('Silakan isi Catatan Khusus untuk keterangan varian/toping minuman atau pisang keju.');
       return;
     }
 
@@ -301,13 +297,13 @@ export default function CartDrawer({
                           <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                             Preferensi Bumbu
                           </label>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {['Gurih', 'Manis'].map((bumbuOpt) => (
+                          <div className="grid grid-cols-3 gap-1">
+                            {['Gurih', 'Manis', 'Gurih Manis'].map((bumbuOpt) => (
                               <button
                                 key={bumbuOpt}
                                 type="button"
                                 onClick={() => onUpdateBowlBumbu(bowl.id, bumbuOpt)}
-                                className={`py-1.5 px-2 rounded-lg text-xs font-bold transition ${
+                                className={`py-1.5 px-1 rounded-lg text-[11px] sm:text-xs font-bold transition text-center ${
                                   bowl.bumbu === bumbuOpt
                                     ? 'bg-primary text-white shadow-sm'
                                     : 'bg-surface text-gray-600 border border-surface-container-high hover:bg-surface-container'
@@ -474,48 +470,53 @@ export default function CartDrawer({
                     <label className="block text-xs font-bold text-dark uppercase tracking-wider mb-1.5">
                       Tipe Pesanan
                     </label>
-                    <div className="grid grid-cols-1 gap-2">
-                      {orderTypeOptions.map((opt) => (
-                        <button
-                          type="button"
-                          key={opt.label}
-                          onClick={() => setOrderType(opt.label)}
-                          className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition ${
-                            orderType === opt.label
-                              ? 'bg-primary/10 border-primary text-primary font-bold'
-                              : 'bg-surface border-surface-container-high text-gray-600 hover:bg-surface-container'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[18px]">
-                              {opt.icon}
-                            </span>
-                            {opt.label}
-                          </span>
-                          {orderType === opt.label && (
-                            <span className="material-symbols-outlined text-[16px] text-primary">
-                              check_circle
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                    <div className="p-3 rounded-xl text-xs font-bold flex items-center justify-between border bg-primary/10 border-primary text-primary shadow-sm">
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[20px]">
+                          takeout_dining
+                        </span>
+                        <span>Bungkus / Ambil di Warung (Takeaway)</span>
+                      </span>
+                      <span className="material-symbols-outlined text-[18px] text-primary">
+                        check_circle
+                      </span>
                     </div>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      Pesanan disiapkan untuk Anda ambil langsung di Warung Seblak Mak Eunin.
+                    </p>
                   </div>
 
                   {/* Catatan Khusus */}
                   <div>
-                    <label className="block text-xs font-bold text-dark uppercase tracking-wider mb-1.5">
-                      Catatan Khusus <span className="text-primary">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-dark uppercase tracking-wider">
+                        Catatan Khusus {isNotesRequired ? (
+                          <span className="text-primary">*</span>
+                        ) : (
+                          <span className="text-gray-400 font-normal text-[11px] lowercase">(opsional)</span>
+                        )}
+                      </label>
+                      {isNotesRequired && (
+                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                          Wajib untuk minuman / pisang keju
+                        </span>
+                      )}
+                    </div>
                     <textarea
                       rows={2}
-                      placeholder="Contoh: Seblak 1 kuah kental, pop ice manis, pisang keju keju banyakin"
+                      placeholder={
+                        isNotesRequired
+                          ? 'Contoh: Pop Ice manis, Pisang Keju parutan keju banyakin...'
+                          : 'Contoh: Kuah kental, sedikit kencur (opsional)...'
+                      }
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       className="w-full px-3.5 py-2 rounded-xl border border-surface-container-high bg-surface text-xs sm:text-sm text-dark placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none"
                     ></textarea>
                     <p className="text-[11px] text-gray-500 mt-1">
-                      Wajib diisi: Keterangan rasa atau pilihan toping minuman / pisang keju jika ada.
+                      {isNotesRequired
+                        ? 'Wajib diisi: Keterangan rasa atau pilihan toping untuk Minuman / Pisang Keju.'
+                        : 'Opsional: Level pedas & bumbu sudah dipilih di atas. Isi jika ada permintaan khusus lainnya.'}
                     </p>
                   </div>
                 </div>
