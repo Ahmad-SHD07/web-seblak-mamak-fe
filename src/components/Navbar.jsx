@@ -3,41 +3,17 @@ import { useState } from 'react';
 export default function Navbar({
   cartCount = 0,
   onOpenCart,
-  activeCategory,
-  onSelectCategory,
   searchQuery,
   onSearchChange
 }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  const categories = [
-    { label: 'Seblak', value: 'Seblak' },
-    { label: 'Topping', value: 'Pilih Topping' },
-    { label: 'Gorengan', value: 'Gorengan' },
-    { label: 'Cobek', value: 'Cobek' },
-    { label: 'Pisang Keju', value: 'Pisang Keju' },
-    { label: 'Minuman', value: 'Minuman' },
-  ];
-
-  const handleNavClick = (catValue) => {
-    if (onSelectCategory) {
-      onSelectCategory(catValue);
-    }
-    const menuSection = document.getElementById('menu-section');
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-surface-container-high shadow-sm w-full transition-all">
       <div className="flex justify-between items-center px-container-margin-mobile md:px-container-margin-desktop py-3.5 max-w-[1280px] mx-auto gap-4">
         {/* Logo & Identitas Brand */}
         <button
-          onClick={() => {
-            if (onSelectCategory) onSelectCategory('Semua Menu');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="flex items-center gap-2 group text-left focus:outline-none"
         >
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
@@ -52,23 +28,7 @@ export default function Navbar({
             </span>
           </div>
         </button>
-
-        {/* Menu Navigasi Desktop */}
-        <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => handleNavClick(cat.value)}
-              className={`text-sm lg:text-base font-semibold transition-colors py-1 px-2.5 rounded-lg ${
-                activeCategory === cat.value
-                  ? 'text-primary font-bold bg-primary/10'
-                  : 'text-dark hover:text-primary hover:bg-surface-container'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </nav>
+        
 
         {/* Aksi Kanan (Pencarian & Keranjang) */}
         <div className="flex items-center gap-2 sm:gap-3">

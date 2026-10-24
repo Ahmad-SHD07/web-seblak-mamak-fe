@@ -1,0 +1,282 @@
+[
+  {
+    "id": "T01",
+    "nama": "Kerupuk Kemplang",
+    "kategori": "Pilih Topping",
+    "harga": 2000,
+    "deskripsi": "Kerupuk kemplang khas seblak, kenyal gurih meresap kuah pedas.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Seblak/seblak2.webp"
+  },
+  {
+    "id": "T02",
+    "nama": "Mie Golosor",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Mie kenyal licin khas Sunda pelengkap wajib seblak prasmanan.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Topping/Mie.jpg"
+  },
+  {
+    "id": "T03",
+    "nama": "Mie Dara",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Mie keriting kenyal bertekstur mantap.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Topping/Mie.jpg"
+  },
+  {
+    "id": "T04",
+    "nama": "Tulang",
+    "kategori": "Pilih Topping",
+    "harga": 5000,
+    "deskripsi": "Tulang rangu ayam gurih dengan sensasi kriuk kenyal lezat.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Topping/ceker.jpg"
+  },
+  {
+    "id": "T05",
+    "nama": "Bakso",
+    "kategori": "Pilih Topping",
+    "harga": 5000,
+    "deskripsi": "Bakso sapi kenyal gurih, favorit pecinta seblak.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Gorengan/Basreng.webp"
+  },
+  {
+    "id": "T06",
+    "nama": "Cikua",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Olahan ikan lembut berbentuk bunga yang gurih.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cipuk.webp"
+  },
+  {
+    "id": "T07",
+    "nama": "Cilok",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Cilok aci kenyal gurih bumbu kencur.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cipuk.webp"
+  },
+  {
+    "id": "T08",
+    "nama": "Batagor",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Batagor mini kering yang lumer lembut di dalam kuah seblak.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cireng.webp"
+  },
+  {
+    "id": "T09",
+    "nama": "Siomay",
+    "kategori": "Pilih Topping",
+    "harga": 3000,
+    "deskripsi": "Siomay kering gurih pelengkap kuah pedas.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cipuk.webp"
+  },
+  {
+    "id": "T10",
+    "nama": "Ceker",
+    "kategori": "Pilih Topping",
+    "harga": 5000,
+    "deskripsi": "Ceker ayam empuk dengan bumbu meresap sempurna.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Topping/ceker.jpg"
+  },
+  {
+    "id": "T11",
+    "nama": "Telur",
+    "kategori": "Pilih Topping",
+    "harga": 4000,
+    "deskripsi": "Telur ayam segar dimasak orak-arik kuah kental.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Topping/Telur.jpg"
+  },
+  {
+    "id": "T12",
+    "nama": "Sosis",
+    "kategori": "Pilih Topping",
+    "harga": 4000,
+    "deskripsi": "Potongan sosis sapi berkualitas rasa gurih.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Topping/Sosis.jpg"
+  },
+  {
+    "id": "T13",
+    "nama": "Pilus Cikur",
+    "kategori": "Pilih Topping",
+    "harga": 2000,
+    "deskripsi": "Taburan pilus kencur renyah garing di atas seblak hangat.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cireng.webp"
+  },
+  {
+    "id": "T14",
+    "nama": "Makaroni",
+    "kategori": "Pilih Topping",
+    "harga": 2000,
+    "deskripsi": "Makaroni kenyal gurih peredam pedas seblak.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Seblak/seblak1.webp"
+  },
+  {
+    "id": "P01",
+    "nama": "Pisang Keju Original",
+    "kategori": "Pisang Keju",
+    "harga": 7000,
+    "deskripsi": "Pisang bakar hangat dengan parutan keju melimpah dan susu manis.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Pisang-Keju/Pisang-Keju.webp"
+  },
+  {
+    "id": "P02",
+    "nama": "Pisang Keju Coklat",
+    "kategori": "Pisang Keju",
+    "harga": 10000,
+    "deskripsi": "Pisang keju lembut dengan taburan meses coklat manis legit.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Pisang-Keju/Pisang-seres.webp"
+  },
+  {
+    "id": "P03",
+    "nama": "Pisang Keju Seres Warna-Warni",
+    "kategori": "Pisang Keju",
+    "harga": 10000,
+    "deskripsi": "Pisang keju cantik dengan taburan meses rainbow ceria.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Pisang-Keju/pisang-Seres-Warni.webp"
+  },
+  {
+    "id": "D01",
+    "nama": "Pop Ice Coklat",
+    "kategori": "Minuman",
+    "harga": 5000,
+    "deskripsi": "Minuman blender rasa coklat manis segar dingin.",
+    "levelPedasDefault": null,
+    "isBestseller": true,
+    "gambar": "/image/Minuman/Pop-Ice-coklat.webp"
+  },
+  {
+    "id": "D02",
+    "nama": "Pop Ice Avocado",
+    "kategori": "Minuman",
+    "harga": 5000,
+    "deskripsi": "Minuman es blender rasa alpukat lembut segar.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Minuman/Pop-Ice-Avocado.webp"
+  },
+  {
+    "id": "D03",
+    "nama": "Milo Dingin",
+    "kategori": "Minuman",
+    "harga": 6000,
+    "deskripsi": "Susu coklat malt Milo dingin manis dan bertenaga.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Minuman/Milo.webp"
+  },
+  {
+    "id": "D04",
+    "nama": "Es Teh Manis",
+    "kategori": "Minuman",
+    "harga": 4000,
+    "deskripsi": "Teh manis dingin segar penawar rasa pedas seblak.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Minuman/Pop-Ice-coklat.webp"
+  },
+  {
+    "id": "D05",
+    "nama": "Es Jeruk Peras",
+    "kategori": "Minuman",
+    "harga": 6000,
+    "deskripsi": "Perasan jeruk murni segar dengan es batu dingin.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Minuman/Pop-Ice-Avocado.webp"
+  },
+  {
+    "id": "D06",
+    "nama": "Air Mineral",
+    "kategori": "Minuman",
+    "harga": 4000,
+    "deskripsi": "Air mineral kemasan dingin atau netral.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Minuman/Milo.webp"
+  },
+  {
+    "id": "G01",
+    "nama": "Bala-bala / Bakwan",
+    "kategori": "Gorengan",
+    "harga": 2000,
+    "deskripsi": "Gorengan sayur hangat dan renyah khas Sunda.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cipuk.webp"
+  },
+  {
+    "id": "G02",
+    "nama": "Tempe Mendoan",
+    "kategori": "Gorengan",
+    "harga": 2000,
+    "deskripsi": "Tempe goreng tepung gurih renyah empuk.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Basreng.webp"
+  },
+  {
+    "id": "G03",
+    "nama": "Cireng Bumbu Rujak",
+    "kategori": "Gorengan",
+    "harga": 10000,
+    "deskripsi": "Cireng garing kenyal dengan cocolan sambal rujak manis pedas.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Gorengan/Cireng.webp"
+  },
+  {
+    "id": "C01",
+    "nama": "Seblak Cobek",
+    "kategori": "Cobek",
+    "harga": 15000,
+    "deskripsi": "Seblak ulek bumbu kencur dan cabai rawit segar di atas cobek asli.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Cobek/Cobek-sosis.webp"
+  },
+  {
+    "id": "C02",
+    "nama": "Basreng Cobek",
+    "kategori": "Cobek",
+    "harga": 12000,
+    "deskripsi": "Bakso goreng iris yang diulek bersama sambal cobek pedas segar.",
+    "levelPedasDefault": null,
+    "isBestseller": false,
+    "gambar": "/image/Cobek/Cobek-basreng.webp"
+  }
+]

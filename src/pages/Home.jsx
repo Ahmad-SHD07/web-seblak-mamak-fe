@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import { useState, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 import HeroBanner from '../components/HeroBanner';
 import CategoryFilter from '../components/CategoryFilter';
@@ -7,316 +6,189 @@ import MenuCard from '../components/MenuCard';
 import CartDrawer from '../components/CartDrawer';
 import Footer from '../components/Footer';
 import { formatRupiah } from '../utils/formatCurrency';
-
-// Master data cadangan lokal (Fallback data jika backend sedang proses start)
-const fallbackMenus = [
-  {
-    id: 'M01',
-    nama: 'Seblak Best Seller (Paket)',
-    kategori: 'Seblak',
-    harga: 10000,
-    deskripsi: 'Seblak Makaroni, Kerupuk Kemplang, Cikua, Mie Kuning, dan Pilus.',
-    levelPedasDefault: 2,
-    isBestseller: true,
-    gambar: '/image/Seblak/seblak2.webp'
-  },
-  {
-    id: 'M02',
-    nama: 'Seblak + Telor',
-    kategori: 'Seblak',
-    harga: 12000,
-    deskripsi: 'Hidangan seblak kuah pedas gurih lengkap dengan campuran telur.',
-    levelPedasDefault: 2,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak.jpg'
-  },
-  {
-    id: 'M03',
-    nama: 'Seblak Makaroni',
-    kategori: 'Seblak',
-    harga: 10000,
-    deskripsi: 'Makaroni klasik dengan kuah pedas khas, cocok untuk camilan mengenyangkan.',
-    levelPedasDefault: 2,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak1.webp'
-  },
-  {
-    id: 'M04',
-    nama: 'Seblak Kerupuk Basah',
-    kategori: 'Seblak',
-    harga: 15000,
-    deskripsi: 'Kerupuk lembut dan kenyal yang disiram dengan kuah pedas otentik.',
-    levelPedasDefault: 2,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak2.webp'
-  },
-  {
-    id: 'M05',
-    nama: 'Seblak Mie',
-    kategori: 'Seblak',
-    harga: 18000,
-    deskripsi: 'Mie kenyal dicampur dengan bumbu pedas ringan dan kerupuk gurih.',
-    levelPedasDefault: 1,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak-mie.jpeg'
-  },
-  {
-    id: 'M06',
-    nama: 'Seblak Ceker',
-    kategori: 'Seblak',
-    harga: 25000,
-    deskripsi: 'Ceker ayam empuk yang dimasak perlahan dalam saus pedas kaya rempah.',
-    levelPedasDefault: 3,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak-ceker.webp'
-  },
-  {
-    id: 'T01',
-    nama: 'Ceker',
-    kategori: 'Pilih Topping',
-    harga: 5000,
-    deskripsi: 'Ceker ayam empuk dengan bumbu meresap.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Topping/ceker.jpg'
-  },
-  {
-    id: 'T02',
-    nama: 'Telur',
-    kategori: 'Pilih Topping',
-    harga: 4000,
-    deskripsi: 'Telur ayam segar, bisa dimasak orak-arik atau rebus.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Topping/Telur.jpg'
-  },
-  {
-    id: 'T03',
-    nama: 'Tulang',
-    kategori: 'Pilih Topping',
-    harga: 5000,
-    deskripsi: 'Tulang rangu ayam yang gurih dan memberikan tekstur kenyal.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Topping/ceker.jpg'
-  },
-  {
-    id: 'T04',
-    nama: 'Mie',
-    kategori: 'Pilih Topping',
-    harga: 3000,
-    deskripsi: 'Mie kuning kenyal sebagai pelengkap karbohidrat.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Topping/Mie.jpg'
-  },
-  {
-    id: 'T05',
-    nama: 'Sosis',
-    kategori: 'Pilih Topping',
-    harga: 4000,
-    deskripsi: 'Potongan sosis sapi berkualitas rasa gurih.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Topping/Sosis.jpg'
-  },
-  {
-    id: 'T06',
-    nama: 'Bakso',
-    kategori: 'Pilih Topping',
-    harga: 5000,
-    deskripsi: 'Bakso sapi kenyal yang lezat, topping wajib seblak.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Basreng.webp'
-  },
-  {
-    id: 'T07',
-    nama: 'Kerupuk Kemplang',
-    kategori: 'Pilih Topping',
-    harga: 2000,
-    deskripsi: 'Tambahan kerupuk kemplang renyah atau basah.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Seblak/seblak2.webp'
-  },
-  {
-    id: 'T08',
-    nama: 'Cikua',
-    kategori: 'Pilih Topping',
-    harga: 3000,
-    deskripsi: 'Olahan ikan bentuk bunga yang lembut dan gurih.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Cipuk.webp'
-  },
-  {
-    id: 'T09',
-    nama: 'Pilus Cikur',
-    kategori: 'Pilih Topping',
-    harga: 2000,
-    deskripsi: 'Taburan pilus kencur renyah pendamping kuah seblak.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Cireng.webp'
-  },
-  {
-    id: 'G01',
-    nama: 'Bala-bala / Bakwan',
-    kategori: 'Gorengan',
-    harga: 2000,
-    deskripsi: 'Gorengan sayur hangat dan renyah.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Cipuk.webp'
-  },
-  {
-    id: 'G02',
-    nama: 'Tempe Mendoan',
-    kategori: 'Gorengan',
-    harga: 2000,
-    deskripsi: 'Tempe goreng tepung bumbu gurih.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Basreng.webp'
-  },
-  {
-    id: 'G03',
-    nama: 'Cireng Bumbu Rujak',
-    kategori: 'Gorengan',
-    harga: 10000,
-    deskripsi: 'Cireng garing dengan cocolan sambal rujak manis pedas.',
-    levelPedasDefault: 1,
-    isBestseller: false,
-    gambar: '/image/Gorengan/Cireng.webp'
-  },
-  {
-    id: 'C01',
-    nama: 'Seblak Cobek',
-    kategori: 'Cobek',
-    harga: 15000,
-    deskripsi: 'Seblak ulek bumbu kencur dan cabai rawit segar.',
-    levelPedasDefault: 3,
-    isBestseller: false,
-    gambar: '/image/Cobek/Cobek-sosis.webp'
-  },
-  {
-    id: 'C02',
-    nama: 'Basreng Cobek',
-    kategori: 'Cobek',
-    harga: 12000,
-    deskripsi: 'Bakso goreng iris yang diulek bersama sambal cobek pedas.',
-    levelPedasDefault: 3,
-    isBestseller: false,
-    gambar: '/image/Cobek/Cobek-basreng.webp'
-  },
-  {
-    id: 'P01',
-    nama: 'Pisang Keju Original',
-    kategori: 'Pisang Keju',
-    harga: 10000,
-    deskripsi: 'Pisang goreng/bakar dengan parutan keju melimpah dan susu.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Pisang-Keju/Pisang-Keju.webp'
-  },
-  {
-    id: 'P02',
-    nama: 'Pisang Keju Coklat',
-    kategori: 'Pisang Keju',
-    harga: 12000,
-    deskripsi: 'Pisang manis dengan taburan keju parut dan meses coklat.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Pisang-Keju/Pisang-seres.webp'
-  },
-  {
-    id: 'D01',
-    nama: 'Es Teh Manis',
-    kategori: 'Minuman',
-    harga: 4000,
-    deskripsi: 'Teh manis dingin segar penawar rasa pedas seblak.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Minuman/Pop-Ice-coklat.webp'
-  },
-  {
-    id: 'D02',
-    nama: 'Es Jeruk Peras',
-    kategori: 'Minuman',
-    harga: 6000,
-    deskripsi: 'Perasan jeruk murni segar dengan es batu dingin.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Minuman/Pop-Ice-Avocado.webp'
-  },
-  {
-    id: 'D03',
-    nama: 'Air Mineral',
-    kategori: 'Minuman',
-    harga: 4000,
-    deskripsi: 'Air mineral kemasan dingin atau netral.',
-    levelPedasDefault: null,
-    isBestseller: false,
-    gambar: '/image/Minuman/Milo.webp'
-  }
-];
+import menusData from '../data/menus.json';
 
 export default function Home() {
-  const [menus, setMenus] = useState(fallbackMenus);
-  const [isLoadingMenus, setIsLoadingMenus] = useState(false);
+  const [menus] = useState(menusData);
   const [activeCategory, setActiveCategory] = useState('Semua Menu');
   const [searchQuery, setSearchQuery] = useState('');
-  const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toastNotification, setToastNotification] = useState(null);
 
-  // Ambil data menu dari Backend API saat pertama kali load
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        setIsLoadingMenus(true);
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://seblak-makeunin.onrender.com/api';
-        const res = await axios.get(`${apiUrl}/menus`, { timeout: 3000 });
-        if (res.data && res.data.success && Array.isArray(res.data.data)) {
-          setMenus(res.data.data);
-        }
-      } catch (err) {
-        console.info('Menggunakan menu lokal (Backend API offline atau belum dijalankan).', err.message);
-      } finally {
-        setIsLoadingMenus(false);
-      }
-    };
+  // ==================== STATE SEBLAK PRASMANAN MULTI-PORSI ====================
+  // Setiap mangkuk seblak memiliki racikan toping, level pedas, dan bumbu masing-masing
+  const [seblakBowls, setSeblakBowls] = useState([
+    {
+      id: 1,
+      name: 'Seblak 1',
+      spicyLevel: 2,
+      bumbu: 'Gurih', // 'Gurih' atau 'Manis'
+      items: []
+    }
+  ]);
+  const [activeBowlId, setActiveBowlId] = useState(1);
 
-    fetchMenus();
-  }, []);
+  // Item non-seblak (Minuman, Pisang Keju, Gorengan, Cobek)
+  const [extraItems, setExtraItems] = useState([]);
 
-  // Notifikasi Toast Helper
-  const showToast = (message) => {
-    setToastMessage(message);
+  // Notifikasi Toast Helper (2.8 detik)
+  const showToast = (toastData) => {
+    setToastNotification(toastData);
     setTimeout(() => {
-      setToastMessage(null);
+      setToastNotification(null);
     }, 2800);
   };
 
-  // State Management Keranjang Belanja
-  const handleAddToCart = (item) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((ci) => ci.id === item.id);
-      if (existing) {
-        return prevCart.map((ci) =>
-          ci.id === item.id ? { ...ci, qty: ci.qty + 1 } : ci
-        );
-      }
-      return [...prevCart, { ...item, qty: 1 }];
-    });
-
-    showToast(`${item.nama} dimasukkan ke keranjang`);
+  // Cek apakah suatu menu adalah toping seblak
+  const isToppingItem = (item) => {
+    return (
+      item.kategori?.toLowerCase() === 'pilih topping' ||
+      String(item.id).startsWith('T')
+    );
   };
 
-  const handleUpdateQty = (itemId, delta) => {
-    setCart((prevCart) => {
-      return prevCart
+  // Tambah item ke keranjang (Toping ke Mangkuk Aktif / Menu lain ke Ekstra)
+  const handleAddToCart = (item) => {
+    if (isToppingItem(item)) {
+      setSeblakBowls((prev) => {
+        return prev.map((bowl) => {
+          if (bowl.id !== activeBowlId) return bowl;
+          const existing = bowl.items.find((i) => i.id === item.id);
+          const updatedItems = existing
+            ? bowl.items.map((i) => (i.id === item.id ? { ...i, qty: i.qty + 1 } : i))
+            : [...bowl.items, { ...item, qty: 1 }];
+          return { ...bowl, items: updatedItems };
+        });
+      });
+
+      const currentBowl = seblakBowls.find((b) => b.id === activeBowlId);
+      const bowlName = currentBowl ? currentBowl.name : 'Seblak 1';
+      showToast({
+        type: 'success',
+        title: 'Toping Ditambahkan!',
+        nama: `${item.nama} dimasukkan ke ${bowlName}`,
+        gambar: item.gambar,
+        showCartBtn: true
+      });
+    } else {
+      setExtraItems((prev) => {
+        const existing = prev.find((i) => i.id === item.id);
+        if (existing) {
+          return prev.map((i) => (i.id === item.id ? { ...i, qty: i.qty + 1 } : i));
+        }
+        return [...prev, { ...item, qty: 1 }];
+      });
+
+      showToast({
+        type: 'success',
+        title: 'Menu Ditambahkan!',
+        nama: `${item.nama} dimasukkan ke keranjang`,
+        gambar: item.gambar,
+        showCartBtn: true
+      });
+    }
+  };
+
+  // Tambah porsi seblak baru (Mangkuk Seblak 2, 3, dst.)
+  const handleAddBowl = () => {
+    const nextNumber = seblakBowls.length + 1;
+    const newBowl = {
+      id: Date.now(),
+      name: `Seblak ${nextNumber}`,
+      spicyLevel: 2,
+      bumbu: 'Gurih',
+      items: []
+    };
+    setSeblakBowls((prev) => [...prev, newBowl]);
+    setActiveBowlId(newBowl.id);
+
+    showToast({
+      type: 'success',
+      title: 'Porsi Baru Dibuat!',
+      nama: `Mangkuk Seblak ${nextNumber} aktif. Silakan pilih topingnya!`,
+      gambar: null,
+      showCartBtn: false
+    });
+  };
+
+  // Hapus porsi seblak
+  const handleRemoveBowl = (bowlId) => {
+    if (seblakBowls.length <= 1) {
+      setSeblakBowls([
+        {
+          id: 1,
+          name: 'Seblak 1',
+          spicyLevel: 2,
+          bumbu: 'Gurih',
+          items: []
+        }
+      ]);
+      setActiveBowlId(1);
+    } else {
+      const remaining = seblakBowls
+        .filter((b) => b.id !== bowlId)
+        .map((b, idx) => ({ ...b, name: `Seblak ${idx + 1}` }));
+      setSeblakBowls(remaining);
+      if (activeBowlId === bowlId) {
+        setActiveBowlId(remaining[0].id);
+      }
+    }
+    showToast({
+      type: 'remove',
+      title: 'Porsi Dihapus!',
+      nama: 'Satu porsi mangkuk seblak telah dihapus',
+      gambar: null,
+      showCartBtn: false
+    });
+  };
+
+  // Ubah level pedas porsi seblak
+  const handleUpdateBowlSpicy = (bowlId, level) => {
+    setSeblakBowls((prev) =>
+      prev.map((b) => (b.id === bowlId ? { ...b, spicyLevel: Number(level) } : b))
+    );
+  };
+
+  // Ubah preferensi bumbu (Gurih / Manis) porsi seblak
+  const handleUpdateBowlBumbu = (bowlId, bumbu) => {
+    setSeblakBowls((prev) =>
+      prev.map((b) => (b.id === bowlId ? { ...b, bumbu } : b))
+    );
+  };
+
+  // Update kuantitas toping di dalam porsi seblak
+  const handleUpdateBowlItemQty = (bowlId, itemId, delta) => {
+    setSeblakBowls((prev) =>
+      prev.map((bowl) => {
+        if (bowl.id !== bowlId) return bowl;
+        const updatedItems = bowl.items
+          .map((item) => {
+            if (item.id === itemId) {
+              const newQty = item.qty + delta;
+              return newQty > 0 ? { ...item, qty: newQty } : null;
+            }
+            return item;
+          })
+          .filter(Boolean);
+        return { ...bowl, items: updatedItems };
+      })
+    );
+  };
+
+  // Hapus satu toping dari porsi seblak
+  const handleRemoveBowlItem = (bowlId, itemId) => {
+    setSeblakBowls((prev) =>
+      prev.map((bowl) => {
+        if (bowl.id !== bowlId) return bowl;
+        return { ...bowl, items: bowl.items.filter((i) => i.id !== itemId) };
+      })
+    );
+  };
+
+  // Update kuantitas menu non-seblak
+  const handleUpdateExtraItemQty = (itemId, delta) => {
+    setExtraItems((prev) =>
+      prev
         .map((item) => {
           if (item.id === itemId) {
             const newQty = item.qty + delta;
@@ -324,28 +196,53 @@ export default function Home() {
           }
           return item;
         })
-        .filter(Boolean);
+        .filter(Boolean)
+    );
+  };
+
+  // Hapus menu non-seblak
+  const handleRemoveExtraItem = (itemId) => {
+    setExtraItems((prev) => prev.filter((i) => i.id !== itemId));
+  };
+
+  // Kosongkan seluruh keranjang
+  const handleClearCart = () => {
+    setSeblakBowls([
+      {
+        id: 1,
+        name: 'Seblak 1',
+        spicyLevel: 2,
+        bumbu: 'Gurih',
+        items: []
+      }
+    ]);
+    setActiveBowlId(1);
+    setExtraItems([]);
+    showToast({
+      type: 'clear',
+      title: 'Keranjang Dikosongkan!',
+      nama: 'Semua pesanan telah dihapus',
+      gambar: null,
+      showCartBtn: false
     });
   };
 
-  const handleRemoveItem = (itemId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
-    showToast('Menu dihapus dari keranjang');
-  };
+  // ==================== KALKULASI TOTAL PESANAN ====================
+  const totalSeblakItemsCount = seblakBowls.reduce(
+    (acc, b) => acc + b.items.reduce((s, i) => s + i.qty, 0),
+    0
+  );
+  const totalExtraItemsCount = extraItems.reduce((acc, i) => acc + i.qty, 0);
+  const totalCartCount = totalSeblakItemsCount + totalExtraItemsCount;
 
-  const handleClearCart = () => {
-    setCart([]);
-    showToast('Keranjang telah dikosongkan');
-  };
-
-  // Hitung total kuantitas dan harga item di keranjang
-  const totalCartCount = cart.reduce((acc, item) => acc + item.qty, 0);
-  const totalCartPrice = cart.reduce((acc, item) => acc + item.harga * item.qty, 0);
-
-  // Cari menu terlaris untuk HeroBanner
-  const bestsellerItem = useMemo(() => {
-    return menus.find((m) => m.isBestseller) || menus[0];
-  }, [menus]);
+  const totalSeblakPrice = seblakBowls.reduce((acc, b) => {
+    const topingTotal = b.items.reduce((s, i) => s + i.harga * i.qty, 0);
+    const extraFee =
+      topingTotal > 0 && (Number(b.spicyLevel) === 4 || Number(b.spicyLevel) === 5) ? 2000 : 0;
+    return acc + (topingTotal > 0 ? topingTotal + extraFee : 0);
+  }, 0);
+  const totalExtraPrice = extraItems.reduce((acc, i) => acc + i.harga * i.qty, 0);
+  const totalCartPrice = totalSeblakPrice + totalExtraPrice;
 
   // Hitung jumlah item per kategori
   const categoryCounts = useMemo(() => {
@@ -361,12 +258,10 @@ export default function Home() {
   // Filter daftar menu berdasarkan Kategori aktif dan Search Query
   const displayedMenus = useMemo(() => {
     return menus.filter((item) => {
-      // Filter kategori
       const matchCategory =
         activeCategory === 'Semua Menu' ||
         item.kategori.toLowerCase() === activeCategory.toLowerCase();
 
-      // Filter query pencarian
       const query = searchQuery.trim().toLowerCase();
       const matchSearch =
         !query ||
@@ -378,35 +273,85 @@ export default function Home() {
     });
   }, [menus, activeCategory, searchQuery]);
 
+  // Info mangkuk aktif saat ini
+  const activeBowlIndex = seblakBowls.findIndex((b) => b.id === activeBowlId);
+  const activeBowlName = activeBowlIndex !== -1 ? `Seblak ${activeBowlIndex + 1}` : 'Seblak 1';
+
   return (
     <div className="min-h-screen bg-background flex flex-col font-body-md text-on-surface">
       {/* Sticky Navbar */}
       <Navbar
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
-        activeCategory={activeCategory}
-        onSelectCategory={(cat) => {
-          setActiveCategory(cat);
-          setSearchQuery('');
-        }}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
       {/* Konten Utama */}
       <main className="flex-grow w-full max-w-[1280px] mx-auto px-container-margin-mobile md:px-container-margin-desktop py-6 md:py-10">
-        {/* Hero Banner (Menu Terlaris) */}
-        {!searchQuery && (
-          <HeroBanner
-            bestsellerItem={bestsellerItem}
-            onOrderNow={(item) => {
-              handleAddToCart(item);
-              setIsCartOpen(true);
-            }}
-          />
-        )}
+        {/* Hero Banner Prasmanan */}
+        {!searchQuery && <HeroBanner />}
 
-        {/* Filter Kategori Interaktif (SPA Tab Switching) */}
+        {/* ==================== SELECTOR PORSI MANGKUK SEBLAK AKTIF ==================== */}
+        <section className="mb-6 p-4 sm:p-5 bg-surface rounded-2xl border-2 border-primary/20 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[24px]">soup_kitchen</span>
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-extrabold text-dark">
+                  Mangkuk Seblak Prasmanan Anda
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Toping yang Anda klik akan masuk ke <span className="font-bold text-primary">{activeBowlName}</span>
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleAddBowl}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold border-2 border-dashed border-primary text-primary hover:bg-primary hover:text-white transition-all flex items-center gap-1.5 self-start sm:self-auto shadow-sm active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>+ Buat Mangkuk Seblak Baru</span>
+            </button>
+          </div>
+
+          {/* Tab Mangkuk-Mangkuk Seblak */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {seblakBowls.map((bowl, idx) => {
+              const isActive = activeBowlId === bowl.id;
+              const topingCount = bowl.items.reduce((acc, i) => acc + i.qty, 0);
+
+              return (
+                <button
+                  key={bowl.id}
+                  onClick={() => setActiveBowlId(bowl.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 shrink-0 ${
+                    isActive
+                      ? 'bg-primary text-white shadow-md ring-2 ring-primary/30 scale-[1.02]'
+                      : 'bg-surface-container text-dark hover:bg-surface-container-high'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px]">
+                    {isActive ? 'check_circle' : 'soup_kitchen'}
+                  </span>
+                  <span>Seblak #{idx + 1}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-surface-container-high text-gray-700'
+                    }`}
+                  >
+                    {topingCount} toping
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Filter Kategori Interaktif */}
         <CategoryFilter
           activeCategory={activeCategory}
           onSelectCategory={(cat) => {
@@ -435,25 +380,7 @@ export default function Home() {
         )}
 
         {/* Katalog Menu (Menu Grid) */}
-        {isLoadingMenus ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div
-                key={i}
-                className="bg-surface rounded-2xl p-4 border border-surface-container-high animate-pulse"
-              >
-                <div className="w-full aspect-square bg-surface-container rounded-xl mb-4"></div>
-                <div className="h-5 bg-surface-container rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-surface-container rounded w-full mb-1"></div>
-                <div className="h-3 bg-surface-container rounded w-2/3 mb-4"></div>
-                <div className="flex justify-between items-center">
-                  <div className="h-6 bg-surface-container rounded w-1/3"></div>
-                  <div className="w-10 h-10 rounded-full bg-surface-container"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : displayedMenus.length > 0 ? (
+        {displayedMenus.length > 0 ? (
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 mb-16">
             {displayedMenus.map((item) => (
               <MenuCard
@@ -507,22 +434,80 @@ export default function Home() {
         </div>
       )}
 
-      {/* Drawer / Modal Keranjang Belanja & Kustomisasi WhatsApp */}
+      {/* Drawer / Modal Keranjang Belanja Prasmanan */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        cartItems={cart}
-        onUpdateQty={handleUpdateQty}
-        onRemoveItem={handleRemoveItem}
+        seblakBowls={seblakBowls}
+        onAddBowl={handleAddBowl}
+        onRemoveBowl={handleRemoveBowl}
+        onUpdateBowlSpicy={handleUpdateBowlSpicy}
+        onUpdateBowlBumbu={handleUpdateBowlBumbu}
+        onUpdateBowlItemQty={handleUpdateBowlItemQty}
+        onRemoveBowlItem={handleRemoveBowlItem}
+        extraItems={extraItems}
+        onUpdateExtraItemQty={handleUpdateExtraItemQty}
+        onRemoveExtraItem={handleRemoveExtraItem}
         onClearCart={handleClearCart}
+        totalCartPrice={totalCartPrice}
+        totalCartCount={totalCartCount}
       />
 
-      {/* Toast Notification Popup */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-dark/95 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 border border-white/10 animate-fadeIn">
-          <span className="material-symbols-outlined text-green-400 text-[18px]">check_circle</span>
-          <span>{toastMessage}</span>
-        </div>
+      {/* Toast Notification Alert (Top-Center) */}
+      {toastNotification && (
+        <aside
+          role="status"
+          aria-live="polite"
+          className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-white border-2 rounded-2xl shadow-2xl p-3 sm:p-4 flex items-center justify-between gap-3 animate-fadeIn ${
+            toastNotification.type === 'success'
+              ? 'border-green-500/30'
+              : 'border-red-500/30'
+          }`}
+        >
+          <div className="flex items-center gap-3 overflow-hidden min-w-0">
+            {toastNotification.gambar ? (
+              <img
+                src={toastNotification.gambar}
+                alt={toastNotification.nama}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-cover border border-gray-200 shrink-0"
+              />
+            ) : (
+              <div className="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[22px]">
+                  {toastNotification.type === 'success' ? 'soup_kitchen' : 'delete'}
+                </span>
+              </div>
+            )}
+
+            <div className="text-left min-w-0">
+              <div
+                className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
+                  toastNotification.type === 'success' ? 'text-green-700' : 'text-red-600'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">
+                  {toastNotification.type === 'success' ? 'check_circle' : 'info'}
+                </span>
+                <span>{toastNotification.title}</span>
+              </div>
+              <p className="text-sm font-extrabold text-gray-900 truncate mt-0.5">
+                {toastNotification.nama}
+              </p>
+            </div>
+          </div>
+
+          {toastNotification.showCartBtn && (
+            <button
+              onClick={() => {
+                setToastNotification(null);
+                setIsCartOpen(true);
+              }}
+              className="shrink-0 whitespace-nowrap bg-primary hover:bg-red-700 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-md active:scale-95"
+            >
+              Lihat Keranjang
+            </button>
+          )}
+        </aside>
       )}
 
       {/* Footer */}
